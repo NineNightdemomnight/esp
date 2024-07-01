@@ -10,24 +10,54 @@ local screenGui = Instance.new("ScreenGui")
 screenGui.Name = "PlayerSelectionGui"
 screenGui.Parent = player.PlayerGui
 
+-- สร้างกรอบหลักของ UI
 local frame = Instance.new("Frame")
-frame.Size = UDim2.new(0.3, 0, 0.5, 0)
-frame.Position = UDim2.new(0.35, 0, 0.25, 0)
-frame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-frame.BackgroundTransparency = 0.5
+frame.Size = UDim2.new(0.3, 0, 0.5, 0)  -- ขนาดของกรอบ UI
+frame.Position = UDim2.new(0.05, 0, 0.25, 0)  -- ตำแหน่งที่ซ้ายสุด
+frame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)  -- สีพื้นหลังของกรอบ
+frame.BackgroundTransparency = 0.6  -- ความโปร่งใสของพื้นหลัง
+frame.BorderSizePixel = 0
 frame.Parent = screenGui
 
+-- เพิ่มมุมมนให้กับกรอบ
+local uiCorner = Instance.new("UICorner")
+uiCorner.CornerRadius = UDim.new(0, 10)  -- ขนาดมุมมน
+uiCorner.Parent = frame
+
+-- เพิ่มภาพพื้นหลังให้กรอบ
+local backgroundImage = Instance.new("ImageLabel")
+backgroundImage.Size = UDim2.new(1, 0, 1, 0)
+backgroundImage.Position = UDim2.new(0, 0, 0, 0)
+backgroundImage.BackgroundTransparency = 1
+backgroundImage.Image = "rbxassetid://123456789"  -- ใส่ ID ของภาพพื้นหลังที่ต้องการ
+backgroundImage.ImageTransparency = 0.4  -- ความโปร่งใสของภาพพื้นหลัง
+backgroundImage.Parent = frame
+
+-- เพิ่มกรอบสีให้กับป้ายชื่อ
+local titleFrame = Instance.new("Frame")
+titleFrame.Size = UDim2.new(1, 0, 0.15, 0)  -- ขนาดของกรอบป้ายชื่อ
+titleFrame.Position = UDim2.new(0, 0, 0, 0)  -- ตำแหน่งของกรอบป้ายชื่อ
+titleFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)  -- สีพื้นหลังของกรอบป้ายชื่อ
+titleFrame.BackgroundTransparency = 0.5  -- ความโปร่งใสของพื้นหลัง
+titleFrame.BorderSizePixel = 0
+titleFrame.Parent = frame
+
+-- สร้างป้ายชื่อของ UI
 local titleLabel = Instance.new("TextLabel")
 titleLabel.Text = "Select a Player"
-titleLabel.Size = UDim2.new(1, 0, 0.2, 0)
-titleLabel.Position = UDim2.new(0, 0, 0, 0)
-titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-titleLabel.BackgroundTransparency = 1
+titleLabel.Size = UDim2.new(1, 0, 1, 0)  -- ขนาดของชื่อ
+titleLabel.Position = UDim2.new(0, 0, 0, 0)  -- ตำแหน่งของชื่อ
+titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)  -- สีของข้อความ
+titleLabel.BackgroundTransparency = 1  -- ความโปร่งใสของพื้นหลัง
 titleLabel.TextScaled = true
-titleLabel.Parent = frame
+titleLabel.Font = Enum.Font.GothamBold
+titleLabel.TextStrokeTransparency = 0.7  -- ขอบข้อความ
+titleLabel.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)  -- สีของขอบข้อความ
+titleLabel.Parent = titleFrame
 
+-- สร้างเลย์เอาต์สำหรับรายการผู้เล่น
 local playerListLayout = Instance.new("UIListLayout")
-playerListLayout.Padding = UDim.new(0, 5)
+playerListLayout.Padding = UDim.new(0, 10)  -- ระยะห่างระหว่างปุ่ม
 playerListLayout.SortOrder = Enum.SortOrder.Name
 playerListLayout.Parent = frame
 
@@ -36,10 +66,14 @@ local selectedPlayer = nil
 local function createCheckbox(player)
     local button = Instance.new("TextButton")
     button.Text = player.Name
-    button.Size = UDim2.new(1, 0, 0.1, 0)
-    button.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-    button.TextColor3 = Color3.fromRGB(255, 255, 255)
+    button.Size = UDim2.new(1, -10, 0.1, 0)  -- ขนาดของปุ่ม
+    button.Position = UDim2.new(0, 5, 0, 5)  -- ตำแหน่งของปุ่ม
+    button.BackgroundColor3 = Color3.fromRGB(40, 40, 40)  -- สีพื้นหลังของปุ่ม
+    button.TextColor3 = Color3.fromRGB(255, 255, 255)  -- สีของข้อความ
     button.TextScaled = true
+    button.Font = Enum.Font.Gotham
+    button.TextStrokeTransparency = 0.8  -- ขอบข้อความ
+    button.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)  -- สีของขอบข้อความ
     button.Parent = frame
 
     button.MouseButton1Click:Connect(function()
@@ -70,3 +104,20 @@ end)
 
 -- Aimbot Functionality from external script
 aimbotScript:Init()
+
+-- สร้างปุ่มปิดสำหรับ GUI
+local closeButton = Instance.new("TextButton")
+closeButton.Size = UDim2.new(0.1, 0, 0.1, 0)  -- ขนาดของปุ่มปิด
+closeButton.Position = UDim2.new(0.9, 0, 0, 0)  -- ตำแหน่งของปุ่มปิด
+closeButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)  -- สีพื้นหลังของปุ่มปิด
+closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)  -- สีของข้อความ
+closeButton.Text = "X"  -- ข้อความของปุ่มปิด
+closeButton.TextScaled = true
+closeButton.Font = Enum.Font.GothamBold
+closeButton.TextStrokeTransparency = 0.5  -- ขอบข้อความ
+closeButton.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)  -- สีของขอบข้อความ
+closeButton.Parent = frame
+
+closeButton.MouseButton1Click:Connect(function()
+    screenGui:Destroy()  -- ทำลาย GUI เมื่อปุ่มปิดถูกคลิก
+end)
