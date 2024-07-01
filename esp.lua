@@ -1,25 +1,26 @@
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+
+-- Create a new Highlight template
 local highlightTemplate = Instance.new("Highlight")
 highlightTemplate.Name = "Highlight"
 highlightTemplate.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+highlightTemplate.Color = Color3.fromRGB(255, 0, 0)  -- Set the default highlight color
+highlightTemplate.OutlineColor = Color3.fromRGB(0, 0, 0)
+highlightTemplate.OutlineTransparency = 0.5
+
+local highlightEnabled = true  -- Variable to track if Highlight is enabled
 
 -- Function to add Highlight to a player's HumanoidRootPart
 local function addHighlight(player)
     if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
         local humanoidRootPart = player.Character:FindFirstChild("HumanoidRootPart")
-        local highlight = humanoidRootPart:FindFirstChild("Highlight")
-        if not highlight then
+        if not humanoidRootPart:FindFirstChild("Highlight") then
             local highlightClone = highlightTemplate:Clone()
             highlightClone.Adornee = humanoidRootPart
             highlightClone.Parent = humanoidRootPart
         end
-
-        -- Example of additional features
-        highlightTemplate.Color = Color3.fromRGB(255, 0, 0) -- Change color of the highlight
-        highlightTemplate.OutlineColor = Color3.fromRGB(0, 0, 0) -- Add an outline to the highlight
-        highlightTemplate.OutlineTransparency = 0.5 -- Change the transparency of the outline
-        highlightTemplate.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
     end
 end
 
@@ -34,6 +35,18 @@ local function removeHighlight(player)
     end
 end
 
+-- Function to toggle Highlight on and off
+local function toggleHighlight()
+    highlightEnabled = not highlightEnabled  -- Toggle the boolean value
+    for _, player in ipairs(Players:GetPlayers()) do
+        if highlightEnabled then
+            addHighlight(player)  -- Add Highlight if enabled
+        else
+            removeHighlight(player)  -- Remove Highlight if disabled
+        end
+    end
+end
+
 -- Add Highlight for existing players
 for _, player in ipairs(Players:GetPlayers()) do
     addHighlight(player)
@@ -42,7 +55,10 @@ end
 -- PlayerAdded event
 Players.PlayerAdded:Connect(function(player)
     player.CharacterAdded:Connect(function(character)
-        addHighlight(player)
+        if highlightEnabled then
+            -- Add Highlight when a new Character is added
+            addHighlight(player)
+        end
         -- Notify when a player joins
         local notif = Instance.new("TextLabel")
         notif.Text = player.Name .. " has joined the game"
@@ -69,17 +85,36 @@ Players.PlayerRemoving:Connect(function(player)
     notif:Destroy()
 end)
 
--- CharacterAdded event
-Players.PlayerAdded:Connect(function(player)
-    player.CharacterAdded:Connect(function(character)
-        -- Make sure to call addHighlight when CharacterAdded
-        addHighlight(player)
-    end)
-end)
-
--- Update highlights during Heartbeat
+-- Improved Heartbeat connection to optimize performance
 RunService.Heartbeat:Connect(function()
     for _, player in ipairs(Players:GetPlayers()) do
-        addHighlight(player) -- Ensure all players have Highlight
+        if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+            if highlightEnabled then
+                addHighlight(player)  -- Ensure all players have Highlight
+            end
+        end
+    end
+end)
+
+-- Add Command for Toggle Highlight
+local Commands = Instance.new("Folder")
+Commands.Name = "Commands"
+Commands.Parent = game.ServerScriptService
+
+local function createCommand(name, callback)
+    local command = Instance.new("RemoteFunction")
+    command.Name = name
+    command.Parent = Commands
+    command.OnServerInvoke = callback
+end
+
+createCommand("ToggleHighlight", function()
+    toggleHighlight()  -- Toggle Highlight on and off
+end)
+
+-- Bind Ctrl+X to toggle Highlight
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+    if not gameProcessed and input.KeyCode == Enum.KeyCode.X and UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) then
+        toggleHighlight()  -- Toggle Highlight when Ctrl+X is pressed
     end
 end)
