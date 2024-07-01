@@ -1,0 +1,72 @@
+-- LocalScript
+
+-- โหลดลิ้งค์ Aimbot
+local aimbotScript = loadstring(game:HttpGet("https://raw.githubusercontent.com/NineNightdemomnight/esp/main/aimbot"))()
+local player = game.Players.LocalPlayer
+local camera = game.Workspace.CurrentCamera
+
+-- สร้าง GUI ให้ผู้เล่นเลือก Player
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "PlayerSelectionGui"
+screenGui.Parent = player.PlayerGui
+
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(0.3, 0, 0.5, 0)
+frame.Position = UDim2.new(0.35, 0, 0.25, 0)
+frame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+frame.BackgroundTransparency = 0.5
+frame.Parent = screenGui
+
+local titleLabel = Instance.new("TextLabel")
+titleLabel.Text = "Select a Player"
+titleLabel.Size = UDim2.new(1, 0, 0.2, 0)
+titleLabel.Position = UDim2.new(0, 0, 0, 0)
+titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+titleLabel.BackgroundTransparency = 1
+titleLabel.TextScaled = true
+titleLabel.Parent = frame
+
+local playerListLayout = Instance.new("UIListLayout")
+playerListLayout.Padding = UDim.new(0, 5)
+playerListLayout.SortOrder = Enum.SortOrder.Name
+playerListLayout.Parent = frame
+
+local selectedPlayer = nil
+
+local function createCheckbox(player)
+    local button = Instance.new("TextButton")
+    button.Text = player.Name
+    button.Size = UDim2.new(1, 0, 0.1, 0)
+    button.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    button.TextColor3 = Color3.fromRGB(255, 255, 255)
+    button.TextScaled = true
+    button.Parent = frame
+
+    button.MouseButton1Click:Connect(function()
+        selectedPlayer = player
+        aimbotScript:SetTarget(player)
+    end)
+end
+
+for _, p in ipairs(game.Players:GetPlayers()) do
+    if p ~= player then
+        createCheckbox(p)
+    end
+end
+
+game.Players.PlayerAdded:Connect(function(p)
+    if p ~= player then
+        createCheckbox(p)
+    end
+end)
+
+game.Players.PlayerRemoving:Connect(function(p)
+    for _, btn in pairs(frame:GetChildren()) do
+        if btn:IsA("TextButton") and btn.Text == p.Name then
+            btn:Destroy()
+        end
+    end
+end)
+
+-- Aimbot Functionality from external script
+aimbotScript:Init()
